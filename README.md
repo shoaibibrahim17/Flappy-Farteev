@@ -2,13 +2,13 @@
 
 ## About the Game
 
-**Flappy Fart-eev** is a modern, humorous take on the classic side-scrolling "flappy" game genre. Instead of wings, our hero uses powerful farts to navigate a treacherous world of glossy green pipes. The game features polished graphics, smooth animations, a persistent scoring system, and a unique character customization feature that lets you play as anyone (or anything) you want!
+**Flappy Fart-eev** is a modern, humorous take on the classic side-scrolling "flappy" game genre. Instead of wings, our hero uses powerful gusts to navigate a treacherous world of glossy green pipes. The game features polished graphics, smooth animations, a persistent scoring system, and a unique character customization feature that lets you play as anyone (or anything) you want!
 
 This enhanced version includes:
 - **Enhanced Physics**: A more fluid and realistic flight model with acceleration and terminal velocity.
 - **Improved Graphics**: Dynamic, multi-layered parallax background, and visually appealing pipes with gradients and borders.
 - **Smoother Animations**: The player character now rotates based on velocity, and features idle bobbing and squash-and-stretch effects for a more lively feel.
-- **Particle Effects**: A more dynamic and humorous "fart" animation.
+- **Particle Effects**: A more dynamic and humorous "gust" animation.
 
 Built with pure HTML, CSS, and JavaScript, this game is designed to be lightweight, cross-platform, and easily customizable.
 
@@ -16,7 +16,7 @@ Built with pure HTML, CSS, and JavaScript, this game is designed to be lightweig
 
 The controls are simple:
 - **Click** your mouse, **tap** your screen, or press the **Spacebar**.
-- Each press makes your character fart, propelling them upwards.
+- Each press makes your character create a powerful gust, propelling them upwards.
 - Gravity will constantly pull your character down.
 - Navigate through the gaps in the pipes to score points.
 - Hitting a pipe or the ground will end the game.
