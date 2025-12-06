@@ -25,17 +25,18 @@ body {
 #game-title {
     position: absolute;
     top: 5%; /* Adjusted position to top */
-    width: 100%;
-    text-align: center;
-    font-size: 1.8em; /* Reduced font size */
+    left: 5%; /* Moved to top-left */
+    width: auto; /* Allow width to shrink to content */
+    text-align: left; /* Align text to left */
+    font-size: 1.2em; /* Reduced font size further */
     z-index: 10;
-    /* More pronounced text shadow for a Flappy Bird-like outline with theme colors */
+    /* Reduced text shadow for smaller font */
     text-shadow:
-        -3px -3px 0 #333, /* Dark outline */
-        3px -3px 0 #333,
-        -3px 3px 0 #333,
-        3px 3px 0 #333,
-        -6px 6px 0 rgba(0,100,0,0.5); /* A slightly offset darker shadow for depth */
+        -1px -1px 0 #333, /* Dark outline */
+        1px -1px 0 #333,
+        -1px 1px 0 #333,
+        1px 1px 0 #333,
+        -2px 2px 0 rgba(0,100,0,0.5); /* A slightly offset darker shadow for depth */
 }
 
 #game-title .c1 { color: #FFD700; } /* Gold */

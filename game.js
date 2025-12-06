@@ -92,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fartSound = new Audio('assets/fart.mp3');
     const hitSound = new Audio('assets/hit.wav');
     const coinMp3Sound = new Audio('assets/coin.mp3'); // New coin MP3 sound
-    let audioCtx; // Declared here
     const groundImg = new Image();
     groundImg.src = 'assets/ground.svg'; // RESTORED
     const DEFAULT_CHAR_SRC = 'assets/mycharacter.png';
@@ -454,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // --- GAME FLOW ---
     function init() {
         player = createPlayer();
+        console.log("init(): player object created:", player);
         pipes = [];
         coins = []; // Reset coins array
         coinsCollected = 0; // Reset collected coins count
@@ -669,6 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAndDrawPipes();
         updateAndDrawCoins(); // Update and draw coins
         player.update();
+        console.log("gameLoop(): Before player.draw(). Player:", player, "Player.draw:", player.draw);
         player.draw();
         
         // Update and draw particles
