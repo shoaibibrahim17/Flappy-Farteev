@@ -1,5 +1,6 @@
 // Wait for the DOM to be fully loaded before running the game script
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOMContentLoaded: Script started.");
 
     // --- DOM ELEMENT SELECTION ---
     const canvas = document.getElementById('game-canvas');
@@ -133,7 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- PLAYER OBJECT ---
     function createPlayer() {
-        return {
+        console.log("createPlayer(): Function started.");
+        const newPlayer = {
             x: 60,
             y: canvas.height / 2,
             width: 70, // Slightly increased size
@@ -176,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
 
             draw: function() {
+                console.log("player.draw(): Drawing player at", this.x, this.y);
                 ctx.save();
                 ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
                 ctx.rotate(this.angle);
@@ -183,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.scale(this.scaleX, this.scaleY);
                 ctx.drawImage(playerImg, -this.width / 2, -this.height / 2, this.width, this.height);
                 ctx.restore();
+                console.log("player.draw(): Finished drawing player.");
             },
 
             jump: function() {
@@ -198,6 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 createFartPuff(this.x, this.y + this.height / 2);
             }
         };
+        console.log("createPlayer(): Function finished, player object created.");
+        return newPlayer;
     }
 
     // --- PIPE HANDLING ---
@@ -364,6 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GAME FLOW ---
     function init() {
+        console.log("init(): Function started.");
         player = createPlayer();
         pipes = [];
         coins = []; // Reset coins array
@@ -399,6 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
             continuousBackgroundMusic.volume = 0.2; // Low volume for continuous background music
             continuousBackgroundMusic.play().catch(e => console.log("Continuous background music play blocked:", e));
         }
+        console.log("init(): Function finished.");
     }
 
     function startGame() {
@@ -558,6 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- MAIN GAME LOOP ---
     function gameLoop() {
+        console.log("gameLoop(): Frame started. gameState:", gameState, "frameCount:", frameCount);
         // Update parallax offsets
         if (gameState === 'playing') {
             backgroundOffset += 1;
@@ -567,19 +576,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        console.log("gameLoop(): Canvas cleared.");
 
         // Draw background
         drawBackground();
+        console.log("gameLoop(): Background drawn.");
         drawForeground(); // Draw the new foreground layer
+        console.log("gameLoop(): Foreground drawn.");
 
         // Update and draw game objects
         updateAndDrawPipes();
+        console.log("gameLoop(): Pipes updated and drawn.");
         updateAndDrawCoins(); // Update and draw coins
+        console.log("gameLoop(): Coins updated and drawn.");
         player.update();
+        console.log("gameLoop(): Player updated.");
         player.draw();
+        console.log("gameLoop(): Player drawn.");
         
         // Update and draw particles
         updateAndDrawFartPuffs();
+        console.log("gameLoop(): Fart puffs updated and drawn.");
 
         frameCount++;
         if (gameState !== 'over') {
@@ -587,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             gameLoop.running = false;
         }
+        console.log("gameLoop(): Frame finished.");
     }
     gameLoop.running = false;
 
@@ -646,4 +664,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZE GAME ---
     init();
+    console.log("DOMContentLoaded: Script finished.");
 });
