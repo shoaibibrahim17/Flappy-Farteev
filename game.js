@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GAME STATE & CONSTANTS ---
     let gameState = 'start'; // 'start', 'playing', 'over'
-    const GRAVITY = 0.4;
+    const GRAVITY = 0.25;
     const JUMP_FORCE = -9;
     const TERMINAL_VELOCITY = 12;
     let pipeSpeed = 2.5;
@@ -224,6 +224,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             ctx.fillStyle = gradient;
             ctx.fillRect(pipe.x, pipe.y, pipe.width, pipe.height);
+
+            // Add subtle inner shadow for depth
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(pipe.x, pipe.y, pipe.width, pipe.height);
+            ctx.clip();
+            ctx.shadowColor = 'rgba(0,0,0,0.4)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.fillRect(pipe.x - 5, pipe.y - 5, pipe.width + 10, pipe.height + 10); // Draw a slightly larger shadowed rectangle
+            ctx.restore();
+            
+            // Add subtle highlights
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; // Light highlight
+            ctx.fillRect(pipe.x + 2, pipe.y + 2, pipe.width - 4, 3); // Top highlight
+            ctx.fillRect(pipe.x + 2, pipe.y + pipe.height - 5, pipe.width - 4, 3); // Bottom highlight
             
             ctx.strokeStyle = '#4f8500';
             ctx.lineWidth = 4;
@@ -275,7 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GAME FLOW ---
     function init() {
-        console.log("init() called. startMenu:", startMenu);
         player = createPlayer();
         pipes = [];
         score = 0;
@@ -310,7 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startGame() {
-        console.log("startGame() called. Current gameState:", gameState);
         gameState = 'playing';
         startMenu.style.display = 'none';
         scoreDisplay.style.display = 'block';
@@ -463,7 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Start game
         startButton.addEventListener('click', () => {
-            console.log("Start button clicked.");
             startGame();
             const continuousBackgroundMusic = document.getElementById('continuous-background-music');
             if (continuousBackgroundMusic && continuousBackgroundMusic.paused) {
