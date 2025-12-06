@@ -60,7 +60,20 @@ document.addEventListener('DOMContentLoaded', () => {
         "You're about as sharp as a spoon.",
         "I've seen more effort from a student trying to get extra credit.",
         "Your score is like a parking ticket on campus - unwelcome and disappointing.",
-        "You're the reason the 'pass/fail' option exists."
+        "You're the reason the 'pass/fail' option exists.",
+        "Your flight path looks more like a dying swan than a majestic bird.",
+        "Did you even try to flap? Or were you just admiring the scenery?",
+        "My grandma can flap better than you, and she's a picture on the wall.",
+        "That was less of a flight and more of a controlled descent into failure.",
+        "I've seen potatoes with better aerial maneuvers.",
+        "Your score is so low, it's practically subterranean.",
+        "Perhaps flying isn't your forte. Have you considered competitive napping?",
+        "You're not just bad; you're consistently, reliably bad. Bravo.",
+        "The pipes are stationary, and you still managed to hit them. Impressive.",
+        "Even gravity is embarrassed for you.",
+        "You've redefined the art of falling with style... into a pipe.",
+        "Is that a high score? Because it looks like a typo.",
+        "Your performance was a masterclass in how not to fly."
     ];
 
     // --- GAME VARIABLES ---

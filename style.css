@@ -121,10 +121,11 @@ canvas {
 }
 
 #roast-text {
-    color: #ff3333;
-    font-size: 0.9em;
+    color: #ffff00; /* Bright yellow for better visibility */
+    font-size: 1.1em; /* Slightly larger font */
     margin-top: 15px;
     font-style: italic;
+    text-shadow: 1px 1px 0 #333; /* Subtle shadow for definition */
 }
 
 /* Game Over Menu Animation */
