@@ -26,9 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const TERMINAL_VELOCITY = 12;
     let pipeSpeed = 2.5;
     const basePipeSpeed = 2;
-    const PIPE_WIDTH = 65;
-    const PIPE_GAP = 180; // Increased gap for easier start
-    const PIPE_SPAWN_RATE = 150; // Less frequent pipes for easier start
+    const PIPE_WIDTH = 50; // Decreased for thinner pipes
+    const PIPE_GAP = 220; // Increased for easier start
+    const PIPE_SPAWN_RATE = 200; // Increased for less frequent pipes
 
     const roastLines = [
         "Are you even trying? Even the library is more fun than this.",
@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let backgroundOffset = 0;
     let cloudOffset = 0;
     let mountainOffset = 0;
+    let foregroundOffset = 0; // New foreground parallax offset
     let fartPuffs = [];
 
     // --- ASSETS ---
@@ -195,8 +196,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generatePipes() {
-        const topPipeHeight = Math.random() * (canvas.height - PIPE_GAP - 120) + 60;
-        const bottomPipeY = topPipeHeight + PIPE_GAP;
+        const minPipeGap = 100; // Minimum gap to ensure playability
+        const currentPipeGap = Math.max(PIPE_GAP - Math.floor(score / 5) * 5, minPipeGap); // Decrease gap every 5 points
+        
+        const topPipeHeight = Math.random() * (canvas.height - currentPipeGap - 120) + 60;
+        const bottomPipeY = topPipeHeight + currentPipeGap;
         const bottomPipeHeight = canvas.height - bottomPipeY - 50; // Account for ground
 
         pipes.push(createPipe(0, topPipeHeight));
@@ -281,6 +285,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 score++;
                 playCoinSound();
                 scoreDisplay.textContent = score;
+                // Add animation class
+                scoreDisplay.classList.add('score-pop');
+                // Remove class after animation to allow re-triggering
+                setTimeout(() => {
+                    scoreDisplay.classList.remove('score-pop');
+                }, 200); // Duration of the animation
             }
 
             // Remove off-screen pipes
@@ -301,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         backgroundOffset = 0;
         cloudOffset = 0;
         mountainOffset = 0;
+        foregroundOffset = 0; // Reset foreground parallax offset
         fartPuffs = [];
         pipeSpeed = basePipeSpeed;
 
@@ -367,6 +378,30 @@ document.addEventListener('DOMContentLoaded', () => {
         // Parallax Mountains (near)
         drawParallaxLayer('#87ab89', 0.5, 200, 100, 30);
 
+        // --- CLOUD DRAWING ---
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // White, semi-transparent clouds
+        const cloudSpeed = 0.3; // Slower than mountains
+        const baseCloudHeight = canvas.height * 0.2; // Clouds appear higher
+
+        // Draw multiple clouds
+        for (let i = 0; i < 5; i++) { // 5 clouds for example
+            const cloudX = (cloudOffset * cloudSpeed * (i + 1)) % (canvas.width * 2) - canvas.width; // Vary speed and ensure looping
+            const cloudY = baseCloudHeight + Math.sin(cloudX / 100 + i) * 20; // Wavy path
+            const cloudWidth = 80 + i * 20;
+            const cloudHeight = 30 + i * 10;
+
+            drawCloud(ctx, cloudX, cloudY, cloudWidth, cloudHeight);
+        }
+
+        // Helper function for drawing a single cloud (simple shape for now)
+        function drawCloud(context, x, y, width, height) {
+            context.beginPath();
+            context.arc(x, y, width / 4, 0, Math.PI * 2);
+            context.arc(x + width * 0.3, y - height * 0.2, width / 3, 0, Math.PI * 2);
+            context.arc(x + width * 0.7, y, width / 4, 0, Math.PI * 2);
+            context.arc(x + width, y + height * 0.2, width / 5, 0, Math.PI * 2);
+            context.fill();
+        }
 
         // Ground
         const groundGradient = ctx.createLinearGradient(0, canvas.height - 50, 0, canvas.height);
@@ -400,6 +435,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineTo(canvas.width, canvas.height);
         ctx.closePath();
         ctx.fill();
+    }
+
+    function drawForeground() {
+        ctx.fillStyle = 'rgba(100, 100, 100, 0.3)'; // Semi-transparent dark rectangles
+        const elementWidth = 30;
+        const elementHeight = 5;
+        const spacing = 40;
+
+        for (let x = (foregroundOffset * 4) % spacing - spacing; x < canvas.width; x += spacing) {
+            ctx.fillRect(x, canvas.height - 30 - Math.random() * 10, elementWidth, elementHeight);
+            ctx.fillRect(x + spacing / 2, canvas.height - 20 - Math.random() * 10, elementWidth, elementHeight);
+        }
     }
 
 
@@ -449,12 +496,14 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundOffset += 1;
             cloudOffset += 0.5;
             mountainOffset += 0.7;
+            foregroundOffset += 3; // Faster moving foreground
         }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Draw background
         drawBackground();
+        drawForeground(); // Draw the new foreground layer
 
         // Update and draw game objects
         updateAndDrawPipes();
