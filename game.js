@@ -119,8 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             x: 60,
             y: canvas.height / 2,
-            width: 100, // Increased size
-            height: 100, // Increased size
+            width: 60, // Adjusted size for better balance
+            height: 60, // Adjusted size for better balance
             velocityY: 0,
             angle: 0,
             // For idle bobbing animation
