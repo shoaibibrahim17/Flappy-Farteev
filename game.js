@@ -91,35 +91,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerImg = new Image();
     const fartSound = new Audio('assets/fart.mp3');
     const hitSound = new Audio('assets/hit.wav');
+    const coinMp3Sound = new Audio('assets/coin.mp3'); // New coin MP3 sound
     let audioCtx;
 
     function playCoinSound() {
-        if (!audioCtx) {
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            } catch (e) {
-                console.error("Web Audio API is not supported in this browser");
-                return;
-            }
+        if (coinMp3Sound) {
+            coinMp3Sound.currentTime = 0; // Rewind to start
+            coinMp3Sound.volume = 0.8; // Set volume
+            coinMp3Sound.play().catch(e => console.log("Coin MP3 play blocked:", e));
         }
-
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        oscillator.type = 'triangle';
-        oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(0.8, audioCtx.currentTime); // Increased volume further
-
-        oscillator.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.05);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-
-
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.15);
-    }
     const groundImg = new Image();
     groundImg.src = 'assets/ground.svg';
     
@@ -218,13 +198,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const COIN_SIZE = 20; // Define coin size
+    const coinShapes = ['circle', 'square', 'triangle']; // Possible coin shapes
 
     function createCoin(x, y) {
         return {
             x: x,
             y: y,
             size: COIN_SIZE,
-            collected: false
+            collected: false,
+            shape: coinShapes[Math.floor(Math.random() * coinShapes.length)] // Randomly assign a shape
         };
     }
 
@@ -251,21 +233,56 @@ document.addEventListener('DOMContentLoaded', () => {
         pipes.push(createPipe(0, topPipeHeight, isMoving, moveRange, moveSpeed));
         pipes.push(createPipe(bottomPipeY, bottomPipeHeight, isMoving, moveRange, moveSpeed));
 
-        // Generate a cluster of coins around the pipe gap
-        if (Math.random() < 0.8) { // 80% chance to spawn coins around pipes
-            const clusterCenterX = canvas.width + PIPE_WIDTH / 2;
-            const clusterCenterY = topPipeHeight + currentPipeGap / 2;
-            const numCoinsInCluster = Math.floor(Math.random() * 3) + 2; // 2 to 4 coins
+        // Generate coin patterns
+        if (Math.random() < 0.8) { // 80% chance to spawn coins
+            const patternType = Math.floor(Math.random() * 4); // 4 different patterns
 
-            for (let j = 0; j < numCoinsInCluster; j++) {
-                const coinX = clusterCenterX + (Math.random() * 60 - 30); // Scatter horizontally
-                const coinY = clusterCenterY + (Math.random() * (currentPipeGap - COIN_SIZE * 2) - (currentPipeGap / 2 - COIN_SIZE)); // Scatter vertically within gap range
-
-                // Ensure coin is within canvas bounds and not directly inside pipes
-                if (coinY > COIN_SIZE && coinY < canvas.height - COIN_SIZE * 2 && // General canvas bounds
-                    !(coinY > topPipeHeight - COIN_SIZE && coinY < bottomPipeY + COIN_SIZE)) { // Avoid pipes
-                    coins.push(createCoin(coinX, coinY));
-                }
+            switch (patternType) {
+                case 0: // Coins in pipe gap
+                    const numGapCoins = Math.floor(Math.random() * 3) + 2; // 2 to 4 coins
+                    for (let j = 0; j < numGapCoins; j++) {
+                        const coinX = canvas.width + PIPE_WIDTH / 2 - COIN_SIZE / 2 + (j * COIN_SIZE * 1.5);
+                        const coinY = topPipeHeight + currentPipeGap / 2 + (Math.random() * 40 - 20);
+                        if (coinY > COIN_SIZE && coinY < canvas.height - COIN_SIZE * 2) {
+                            coins.push(createCoin(coinX, coinY));
+                        }
+                    }
+                    break;
+                case 1: // Diagonal line of coins
+                    const numDiagCoins = Math.floor(Math.random() * 3) + 3; // 3 to 5 coins
+                    const startY = Math.random() * (canvas.height - numDiagCoins * COIN_SIZE * 2) + COIN_SIZE;
+                    for (let j = 0; j < numDiagCoins; j++) {
+                        const coinX = canvas.width + PIPE_WIDTH / 2 - COIN_SIZE / 2 + (j * COIN_SIZE * 1.5);
+                        const coinY = startY + j * COIN_SIZE * 1.5;
+                        if (coinY > COIN_SIZE && coinY < canvas.height - COIN_SIZE * 2 &&
+                            !(coinY > topPipeHeight - COIN_SIZE && coinY < bottomPipeY + COIN_SIZE)) {
+                            coins.push(createCoin(coinX, coinY));
+                        }
+                    }
+                    break;
+                case 2: // Vertical line of coins
+                    const numVertCoins = Math.floor(Math.random() * 3) + 2; // 2 to 4 coins
+                    const vertX = canvas.width + PIPE_WIDTH + COIN_SIZE * 2;
+                    const vertStartY = Math.random() * (canvas.height - numVertCoins * COIN_SIZE * 2) + COIN_SIZE;
+                    for (let j = 0; j < numVertCoins; j++) {
+                        const coinY = vertStartY + j * COIN_SIZE * 1.5;
+                        if (coinY > COIN_SIZE && coinY < canvas.height - COIN_SIZE * 2 &&
+                            !(coinY > topPipeHeight - COIN_SIZE && coinY < bottomPipeY + COIN_SIZE)) {
+                            coins.push(createCoin(vertX, coinY));
+                        }
+                    }
+                    break;
+                case 3: // Random scattered coins in a safe area
+                    const numScatteredCoins = Math.floor(Math.random() * 3) + 2; // 2 to 4 coins
+                    for (let j = 0; j < numScatteredCoins; j++) {
+                        const coinX = canvas.width + PIPE_WIDTH / 2 - COIN_SIZE / 2 + (Math.random() * 100 - 50);
+                        const coinY = Math.random() * (canvas.height - COIN_SIZE * 4) + COIN_SIZE * 2;
+                        if (coinY > COIN_SIZE && coinY < canvas.height - COIN_SIZE * 2 &&
+                            !(coinY > topPipeHeight - COIN_SIZE && coinY < bottomPipeY + COIN_SIZE)) {
+                            coins.push(createCoin(coinX, coinY));
+                        }
+                    }
+                    break;
             }
         }
     }
@@ -413,19 +430,28 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
             
-                        // Draw coin if not collected
-                        if (!coin.collected) {
-                            ctx.save();
-                            ctx.fillStyle = '#FFD700'; // Gold color
-                            ctx.strokeStyle = '#DAA520'; // Darker gold border
-                            ctx.lineWidth = 2;
-                            ctx.beginPath();
-                            ctx.arc(coin.x + coin.size / 2, coin.y + coin.size / 2, coin.size / 2, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.stroke();
-                            ctx.restore();
-                        }
-            
+                                    // Draw coin if not collected
+                                    if (!coin.collected) {
+                                        ctx.save();
+                                        ctx.fillStyle = '#FFD700'; // Gold color
+                                        ctx.strokeStyle = '#DAA520'; // Darker gold border
+                                        ctx.lineWidth = 2;
+                        
+                                        ctx.beginPath();
+                                        if (coin.shape === 'circle') {
+                                            ctx.arc(coin.x + coin.size / 2, coin.y + coin.size / 2, coin.size / 2, 0, Math.PI * 2);
+                                        } else if (coin.shape === 'square') {
+                                            ctx.rect(coin.x, coin.y, coin.size, coin.size);
+                                        } else if (coin.shape === 'triangle') {
+                                            ctx.moveTo(coin.x + coin.size / 2, coin.y);
+                                            ctx.lineTo(coin.x + coin.size, coin.y + coin.size);
+                                            ctx.lineTo(coin.x, coin.y + coin.size);
+                                            ctx.closePath();
+                                        }
+                                        ctx.fill();
+                                        ctx.stroke();
+                                        ctx.restore();
+                                    }            
                         // Remove off-screen or collected coins
                         if (coin.x + coin.size < 0 || coin.collected) {
                             coins.splice(i, 1);

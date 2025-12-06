@@ -27,7 +27,7 @@ body {
     top: 15%; /* Adjust position slightly */
     width: 100%;
     text-align: center;
-    font-size: 3.5em; /* Larger font size */
+    font-size: 2.5em; /* Reduced font size */
     /* text-shadow will be on the whole title */
     z-index: 10;
     /* More pronounced text shadow for a Flappy Bird-like outline with theme colors */
