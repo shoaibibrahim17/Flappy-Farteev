@@ -28,7 +28,7 @@ body {
     width: 100%;
     text-align: center;
     font-size: 3.5em; /* Larger font size */
-    color: #a4e600; /* Vibrant greenish-yellow color for the theme */
+    /* text-shadow will be on the whole title */
     z-index: 10;
     /* More pronounced text shadow for a Flappy Bird-like outline with theme colors */
     text-shadow:
@@ -37,6 +37,14 @@ body {
         -3px 3px 0 #333,
         3px 3px 0 #333,
         -6px 6px 0 rgba(0,100,0,0.5); /* A slightly offset darker shadow for depth */
+}
+
+#game-title .part1 {
+    color: #FF5733; /* First color (e.g., orange-red) */
+}
+
+#game-title .part2 {
+    color: #33FF57; /* Second color (e.g., vibrant green) */
 }
 
 canvas {
