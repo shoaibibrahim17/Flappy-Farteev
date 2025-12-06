@@ -528,6 +528,10 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBackground();
         drawForeground(); // Draw the new foreground layer
 
+        // Update and draw game objects
+        updateAndDrawPipes();
+        player.update();
+
 
         console.log("gameLoop(): Before player.draw(). Player:", player, "Player.draw:", player.draw);
         player.draw();
