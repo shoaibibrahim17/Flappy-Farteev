@@ -119,8 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             x: 60,
             y: canvas.height / 2,
-            width: 40,
-            height: 40,
+            width: 100, // Increased size
+            height: 100, // Increased size
             velocityY: 0,
             angle: 0,
             // For idle bobbing animation
@@ -299,6 +299,13 @@ document.addEventListener('DOMContentLoaded', () => {
              gameLoop.running = true;
              requestAnimationFrame(gameLoop);
         }
+
+        // Continuous Background Music
+        const continuousBackgroundMusic = document.getElementById('continuous-background-music');
+        if (continuousBackgroundMusic) {
+            continuousBackgroundMusic.volume = 0.2; // Low volume for continuous background music
+            continuousBackgroundMusic.play().catch(e => console.log("Continuous background music play blocked:", e));
+        }
     }
 
     function startGame() {
@@ -453,7 +460,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- EVENT LISTENERS ---
     
     // Start game
-    startButton.addEventListener('click', startGame);
+        startGameButton.addEventListener('click', () => {
+            startGame();
+            const continuousBackgroundMusic = document.getElementById('continuous-background-music');
+            if (continuousBackgroundMusic && continuousBackgroundMusic.paused) {
+                continuousBackgroundMusic.play().catch(e => console.log("Continuous background music play blocked by user interaction:", e));
+            }
+            // Removed existing backgroundMusic play for fart.mp3
+        });
 
     // Restart game
     restartButton.addEventListener('click', init);
