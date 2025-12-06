@@ -321,7 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function init() {
         player = createPlayer();
         console.log("init(): player object created:", player);
-
+        pipes = []; // Ensure pipes array is initialized
+        generatePipes(); // Generate initial pipes
         score = 0;
         frameCount = 0;
         bestScore = localStorage.getItem('bestScore') || 0;
@@ -531,9 +532,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update and draw game objects
         updateAndDrawPipes();
         player.update();
-
-
-        console.log("gameLoop(): Before player.draw(). Player:", player, "Player.draw:", player.draw);
         player.draw();
         
         // Update and draw particles
