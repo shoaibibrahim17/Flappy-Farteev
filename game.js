@@ -556,6 +556,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Restart game
     restartButton.addEventListener('click', init);
 
+    // Share Screenshot
+    const shareScreenshotButton = document.getElementById('share-screenshot-button');
+    if (shareScreenshotButton) {
+        shareScreenshotButton.addEventListener('click', () => {
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'FlappyFart-eev-score.png';
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
+
     // No character customization needed
 
     // Player jump controls
