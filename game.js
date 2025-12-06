@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             coinMp3Sound.volume = 0.8; // Set volume
             coinMp3Sound.play().catch(e => console.log("Coin MP3 play blocked:", e));
         }
-    const groundImg = new Image();
+    }
     groundImg.src = 'assets/ground.svg';
     
     // --- PLAYER CUSTOMIZATION ---
