@@ -17,16 +17,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // Score Displays
     const finalScoreDisplay = document.getElementById('final-score');
     const bestScoreDisplay = document.getElementById('best-score');
+    const roastText = document.getElementById('roast-text');
 
     // --- GAME STATE & CONSTANTS ---
     let gameState = 'start'; // 'start', 'playing', 'over'
     const GRAVITY = 0.4;
     const JUMP_FORCE = -9;
     const TERMINAL_VELOCITY = 12;
-    const PIPE_SPEED = 2.5;
+    let pipeSpeed = 2.5;
+    const basePipeSpeed = 2.5;
     const PIPE_WIDTH = 65;
     const PIPE_GAP = 160;
     const PIPE_SPAWN_RATE = 110;
+
+    const roastLines = [
+        "Your score is lower than my expectations for humanity.",
+        "Even a potato could do better.",
+        "Did you even try? Or is this your 'best'?",
+        "I've seen glaciers move faster than you.",
+        "Are you playing with your feet?",
+        "Maybe you should try a tutorial first.",
+        "That was... a valiant effort. For you.",
+        "I'm not mad, just disappointed.",
+        "You're the reason they put instructions on shampoo bottles.",
+        "My grandma plays better than you. And she's been dead for 5 years.",
+        "You should donate your score to charity. They need the cents.",
+        "I've seen more impressive scores on a microwave.",
+        "Were you trying to lose?",
+        "You're like a broken pencil... pointless.",
+        "I'm not saying you're bad, but you're not good.",
+        "Your score is the answer to 'what's the loneliest number?'",
+        "It's okay, not everyone can be good at video games.",
+        "That was a disaster. A beautiful, beautiful disaster.",
+        "You're the human equivalent of a participation trophy.",
+        "I've had more exciting naps.",
+        "Your score is a rounding error.",
+        "You're not just bad, you're impressively bad.",
+        "On a scale of 1 to 10, you're a solid -5.",
+        "I've seen better scores in a game of tic-tac-toe.",
+        "You should put that score on your resume. Under 'hobbies'.",
+        "Your score called. It wants to know why you hate it.",
+        "I'd say 'good game,' but I'd be lying.",
+        "You're like a reverse Midas. Everything you touch turns to... well, this.",
+        "I'm starting to think you're doing this on purpose.",
+        "You should get a trophy for 'Most Effort, Least Results'."
+    ];
 
     // --- GAME VARIABLES ---
     let player, pipes, score, bestScore, frameCount;
@@ -171,13 +206,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateAndDrawPipes() {
         if (gameState !== 'playing') return;
 
+        pipeSpeed = basePipeSpeed + Math.floor(score / 5) * 0.5;
+
         if (frameCount % PIPE_SPAWN_RATE === 0) {
             generatePipes();
         }
 
         for (let i = pipes.length - 1; i >= 0; i--) {
             const pipe = pipes[i];
-            pipe.x -= PIPE_SPEED;
+            pipe.x -= pipeSpeed;
             
             // Draw pipe with enhanced glossy effect and border
             const gradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.width, 0);
@@ -248,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cloudOffset = 0;
         mountainOffset = 0;
         fartPuffs = [];
+        pipeSpeed = basePipeSpeed;
 
         // Load character and setup UI
         loadCharacter();
@@ -285,6 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Display game over menu
             finalScoreDisplay.textContent = score;
             bestScoreDisplay.textContent = bestScore;
+            const randomRoast = roastLines[Math.floor(Math.random() * roastLines.length)];
+            roastText.textContent = randomRoast;
             gameOverMenu.style.display = 'flex';
         }
     }
