@@ -92,6 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const fartSound = new Audio('assets/fart.mp3');
     const hitSound = new Audio('assets/hit.wav');
     const coinMp3Sound = new Audio('assets/coin.mp3'); // New coin MP3 sound
+    // --- Coin Sound Function ---
+    function playCoinSound() {
+        if (coinMp3Sound) {
+            coinMp3Sound.currentTime = 0; // Rewind to start
+            coinMp3Sound.volume = 0.8; // Set volume
+            coinMp3Sound.play().catch(e => console.log("Coin MP3 play blocked:", e));
+        }
+    }
     const groundImg = new Image();
     groundImg.src = 'assets/ground.svg'; // RESTORED
     const DEFAULT_CHAR_SRC = 'assets/mycharacter.png';
