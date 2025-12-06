@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- GAME STATE & CONSTANTS ---
     let gameState = 'start'; // 'start', 'playing', 'over'
     const GRAVITY = 0.25;
-    const JUMP_FORCE = -9;
+    const JUMP_FORCE = -6;
     const TERMINAL_VELOCITY = 12;
     let pipeSpeed = 2.5;
     const basePipeSpeed = 2;
