@@ -120,8 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             x: 60,
             y: canvas.height / 2,
-            width: 60, // Adjusted size for better balance
-            height: 60, // Adjusted size for better balance
+            width: 70, // Slightly increased size
+            height: 70, // Slightly increased size
             velocityY: 0,
             angle: 0,
             // For idle bobbing animation
@@ -320,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreDisplay.style.display = 'none';
         startMenu.style.display = 'flex';
         gameOverMenu.style.display = 'none';
+        gameOverMenu.classList.remove('game-over-fade-in'); // Remove animation class on init
         scoreDisplay.textContent = '0';
 
         // Start the game loop
@@ -361,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const randomRoast = roastLines[Math.floor(Math.random() * roastLines.length)];
             roastText.textContent = randomRoast;
             gameOverMenu.style.display = 'flex';
+            gameOverMenu.classList.add('game-over-fade-in'); // Apply animation
         }
     }
 
