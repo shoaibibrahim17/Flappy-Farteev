@@ -275,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GAME FLOW ---
     function init() {
+        console.log("init() called. startMenu:", startMenu);
         player = createPlayer();
         pipes = [];
         score = 0;
@@ -309,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startGame() {
+        console.log("startGame() called. Current gameState:", gameState);
         gameState = 'playing';
         startMenu.style.display = 'none';
         scoreDisplay.style.display = 'block';
@@ -460,7 +462,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- EVENT LISTENERS ---
     
     // Start game
-        startGameButton.addEventListener('click', () => {
+        startButton.addEventListener('click', () => {
+            console.log("Start button clicked.");
             startGame();
             const continuousBackgroundMusic = document.getElementById('continuous-background-music');
             if (continuousBackgroundMusic && continuousBackgroundMusic.paused) {
