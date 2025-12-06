@@ -20,12 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GAME STATE & CONSTANTS ---
     let gameState = 'start'; // 'start', 'playing', 'over'
-    const GRAVITY = 0.5;
-    const JUMP_FORCE = -8;
-    const PIPE_SPEED = 2;
-    const PIPE_WIDTH = 60;
-    const PIPE_GAP = 150;
-    const PIPE_SPAWN_RATE = 120; // Lower is more frequent
+    const GRAVITY = 0.4;
+    const JUMP_FORCE = -9;
+    const TERMINAL_VELOCITY = 12;
+    const PIPE_SPEED = 2.5;
+    const PIPE_WIDTH = 65;
+    const PIPE_GAP = 160;
+    const PIPE_SPAWN_RATE = 110;
 
     // --- GAME VARIABLES ---
     let player, pipes, score, bestScore, frameCount;
@@ -56,12 +57,16 @@ document.addEventListener('DOMContentLoaded', () => {
         oscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
 
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
-        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        oscillator.type = 'triangle';
+        oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+
+        oscillator.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
 
         oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.1);
+        oscillator.stop(audioCtx.currentTime + 0.15);
     }
     const groundImg = new Image();
     groundImg.src = 'assets/ground.svg';
@@ -79,13 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             x: 60,
             y: canvas.height / 2,
-            width: 38,
-            height: 38,
+            width: 40,
+            height: 40,
             velocityY: 0,
             angle: 0,
             // For idle bobbing animation
             bobbingAngle: 0,
-            bobbingSpeed: 0.05,
+            bobbingSpeed: 0.04,
             // For squash and stretch effect
             scaleX: 1,
             scaleY: 1,
@@ -94,23 +99,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Gameplay physics
                 if (gameState === 'playing') {
                     this.velocityY += GRAVITY;
+                    if (this.velocityY > TERMINAL_VELOCITY) {
+                        this.velocityY = TERMINAL_VELOCITY;
+                    }
                     this.y += this.velocityY;
 
                     // Angle rotation based on velocity
-                    this.angle = Math.min(Math.max(this.velocityY / 10, -0.5), 0.9);
+                    this.angle = Math.min(Math.max(this.velocityY / 15, -0.6), 1.2);
 
-                    // Reset squash/stretch effect
-                    this.scaleX = Math.max(1, this.scaleX - 0.05);
-                    this.scaleY = Math.min(1, this.scaleY + 0.05);
+                    // Dynamic squash/stretch reset
+                    this.scaleX = Math.max(1, this.scaleX - 0.04);
+                    this.scaleY = Math.min(1, this.scaleY + 0.04);
 
                     // Check for collision with top/bottom boundaries
-                    if (this.y + this.height > canvas.height || this.y < 0) {
+                    if (this.y + this.height > canvas.height - 40 || this.y < -10) { // Added buffer
                         endGame();
                     }
                 }
                 // Idle animation on start screen
                 else if (gameState === 'start') {
-                    this.y = (canvas.height / 2) + Math.sin(this.bobbingAngle) * 5;
+                    this.y = (canvas.height / 2) + Math.sin(this.bobbingAngle) * 6;
                     this.bobbingAngle += this.bobbingSpeed;
                 }
             },
@@ -131,17 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 fartSound.play();
 
                 // Apply squash and stretch effect
-                this.scaleX = 1.3;
-                this.scaleY = 0.7;
+                this.scaleX = 1.4;
+                this.scaleY = 0.6;
 
                 // Create fart puff
-                fartPuffs.push({
-                    x: this.x - 10,
-                    y: this.y + this.height / 2,
-                    size: 5,
-                    opacity: 1,
-                    velocityX: -1
-                });
+                createFartPuff(this.x, this.y + this.height / 2);
             }
         };
     }
@@ -158,9 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generatePipes() {
-        const topPipeHeight = Math.random() * (canvas.height - PIPE_GAP - 100) + 50;
+        const topPipeHeight = Math.random() * (canvas.height - PIPE_GAP - 120) + 60;
         const bottomPipeY = topPipeHeight + PIPE_GAP;
-        const bottomPipeHeight = canvas.height - bottomPipeY;
+        const bottomPipeHeight = canvas.height - bottomPipeY - 50; // Account for ground
 
         pipes.push(createPipe(0, topPipeHeight));
         pipes.push(createPipe(bottomPipeY, bottomPipeHeight));
@@ -177,29 +179,50 @@ document.addEventListener('DOMContentLoaded', () => {
             const pipe = pipes[i];
             pipe.x -= PIPE_SPEED;
             
-            // Draw pipe with glossy effect
+            // Draw pipe with enhanced glossy effect and border
             const gradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.width, 0);
-            gradient.addColorStop(0, '#558000');
-            gradient.addColorStop(0.5, '#78a800');
-            gradient.addColorStop(1, '#558000');
+            gradient.addColorStop(0, '#6bab00');
+            gradient.addColorStop(0.5, '#8ed400');
+            gradient.addColorStop(1, '#6bab00');
+
             ctx.fillStyle = gradient;
             ctx.fillRect(pipe.x, pipe.y, pipe.width, pipe.height);
-            ctx.strokeStyle = '#000';
+            
+            ctx.strokeStyle = '#4f8500';
+            ctx.lineWidth = 4;
             ctx.strokeRect(pipe.x, pipe.y, pipe.width, pipe.height);
 
 
-            // Check for collision
-            if (
-                player.x < pipe.x + pipe.width &&
-                player.x + player.width > pipe.x &&
-                player.y < pipe.y + pipe.height &&
-                player.y + player.height > pipe.y
-            ) {
+            // Improved circular collision detection
+            const playerCircle = {
+                x: player.x + player.width / 2,
+                y: player.y + player.height / 2,
+                radius: player.width / 2 - 2 // small tolerance
+            };
+
+            const pipeRect = {
+                x: pipe.x,
+                y: pipe.y,
+                width: pipe.width,
+                height: pipe.height
+            };
+
+            // Find closest point in pipe rectangle to player circle center
+            let closestX = Math.max(pipeRect.x, Math.min(playerCircle.x, pipeRect.x + pipeRect.width));
+            let closestY = Math.max(pipeRect.y, Math.min(playerCircle.y, pipeRect.y + pipeRect.height));
+            
+            // Calculate distance between closest point and circle center
+            let distanceX = playerCircle.x - closestX;
+            let distanceY = playerCircle.y - closestY;
+            let distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+
+            if (distanceSquared < (playerCircle.radius * playerCircle.radius)) {
                 endGame();
             }
 
+
             // Check for passing pipe to score
-            if (!pipe.passed && pipe.x < player.x && i % 2 === 0) { // Only score on top pipes
+            if (!pipe.passed && pipe.x + pipe.width < player.x && i % 2 === 0) {
                 pipe.passed = true;
                 score++;
                 playCoinSound();
@@ -270,67 +293,90 @@ document.addEventListener('DOMContentLoaded', () => {
     function drawBackground() {
         // Sky gradient
         const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        skyGradient.addColorStop(0, '#87CEEB'); // Light blue
-        skyGradient.addColorStop(1, '#70c5ce'); // Original sky color
+        skyGradient.addColorStop(0, '#65c3e8'); 
+        skyGradient.addColorStop(1, '#9fdeb3');
         ctx.fillStyle = skyGradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Clouds (slow parallax)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        for (let i = 0; i < 5; i++) {
-            const x = (i * 100 + cloudOffset) % (canvas.width + 100);
-            ctx.beginPath();
-            ctx.arc(x, 100 + i * 20, 30, 0, Math.PI * 2);
-            ctx.fill();
-        }
+        // Parallax Mountains (far)
+        drawParallaxLayer('#a1c4a3', 0.2, 250, 150, 50);
+        // Parallax Mountains (near)
+        drawParallaxLayer('#87ab89', 0.5, 200, 100, 30);
 
-        // Mountains (medium parallax)
-        ctx.fillStyle = '#8B4513';
-        for (let i = 0; i < 3; i++) {
-            const x = (i * 150 + mountainOffset) % (canvas.width + 150);
-            ctx.beginPath();
-            ctx.moveTo(x, canvas.height - 100);
-            ctx.lineTo(x + 75, canvas.height - 200);
-            ctx.lineTo(x + 150, canvas.height - 100);
-            ctx.closePath();
-            ctx.fill();
-        }
 
-        // Ground (fast parallax)
-        ctx.fillStyle = '#228B22';
-        ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
-        // Draw ground image if loaded
+        // Ground
+        const groundGradient = ctx.createLinearGradient(0, canvas.height - 50, 0, canvas.height);
+        groundGradient.addColorStop(0, '#78ab7a');
+        groundGradient.addColorStop(1, '#5d8a5f');
+        ctx.fillStyle = groundGradient;
+        ctx.fillRect(0, canvas.height - 50, canvas.width, 100);
+
+        // Draw ground image pattern
         if (groundImg.complete) {
-            for (let x = backgroundOffset % 50; x < canvas.width; x += 50) {
-                ctx.drawImage(groundImg, x, canvas.height - 50, 50, 50);
+            ctx.globalAlpha = 0.5;
+            for (let x = (backgroundOffset * 1.5) % 60; x < canvas.width; x += 60) {
+                ctx.drawImage(groundImg, x, canvas.height - 55, 60, 60);
             }
+            ctx.globalAlpha = 1;
+        }
+
+    }
+    
+    function drawParallaxLayer(color, speed, amplitude, period, yOffset) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height);
+
+        const parallaxOffset = mountainOffset * speed;
+
+        for (let x = 0; x <= canvas.width; x++) {
+            const y = canvas.height - yOffset - Math.sin((x + parallaxOffset) / period) * amplitude;
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+
+    // --- FART PUFF ANIMATION ---
+    function createFartPuff(x, y) {
+        for (let i = 0; i < 15; i++) { // More particles
+            fartPuffs.push({
+                x: x,
+                y: y,
+                size: Math.random() * 8 + 3,
+                opacity: 1,
+                velocityX: Math.random() * 2 - 4, // More outward velocity
+                velocityY: Math.random() * 4 - 2,
+                shrinkRate: 0.03 + Math.random() * 0.03,
+                color: `rgba(160, 82, 45, ${0.5 + Math.random() * 0.3})` // Shade variation
+            });
         }
     }
 
-    // --- FART PUFF ANIMATION ---
-    function updateFartPuffs() {
+    function updateAndDrawFartPuffs() {
         for (let i = fartPuffs.length - 1; i >= 0; i--) {
             const puff = fartPuffs[i];
             puff.x += puff.velocityX;
-            puff.size += 0.5;
-            puff.opacity -= 0.02;
+            puff.y += puff.velocityY;
+            puff.size -= puff.shrinkRate * 2;
+            puff.opacity -= puff.shrinkRate;
 
-            if (puff.opacity <= 0) {
+            if (puff.opacity <= 0 || puff.size <= 0.2) {
                 fartPuffs.splice(i, 1);
+            } else {
+                 // Draw the puff
+                ctx.fillStyle = puff.color;
+                ctx.globalAlpha = puff.opacity;
+                ctx.beginPath();
+                ctx.arc(puff.x, puff.y, puff.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
-    }
-
-    function drawFartPuffs() {
-        ctx.fillStyle = 'rgba(139, 69, 19, 0.5)'; // Brownish color for fart
-        fartPuffs.forEach(puff => {
-            ctx.globalAlpha = puff.opacity;
-            ctx.beginPath();
-            ctx.arc(puff.x, puff.y, puff.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
         ctx.globalAlpha = 1; // Reset alpha
     }
+
 
     // --- MAIN GAME LOOP ---
     function gameLoop() {
@@ -346,14 +392,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw background
         drawBackground();
 
-        // Update and draw fart puffs
-        updateFartPuffs();
-        drawFartPuffs();
-
         // Update and draw game objects
         updateAndDrawPipes();
         player.update();
         player.draw();
+        
+        // Update and draw particles
+        updateAndDrawFartPuffs();
 
         frameCount++;
         if (gameState !== 'over') {

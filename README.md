@@ -4,6 +4,12 @@
 
 **Flappy Fart-eev** is a modern, humorous take on the classic side-scrolling "flappy" game genre. Instead of wings, our hero uses powerful farts to navigate a treacherous world of glossy green pipes. The game features polished graphics, smooth animations, a persistent scoring system, and a unique character customization feature that lets you play as anyone (or anything) you want!
 
+This enhanced version includes:
+- **Enhanced Physics**: A more fluid and realistic flight model with acceleration and terminal velocity.
+- **Improved Graphics**: Dynamic, multi-layered parallax background, and visually appealing pipes with gradients and borders.
+- **Smoother Animations**: The player character now rotates based on velocity, and features idle bobbing and squash-and-stretch effects for a more lively feel.
+- **Particle Effects**: A more dynamic and humorous "fart" animation.
+
 Built with pure HTML, CSS, and JavaScript, this game is designed to be lightweight, cross-platform, and easily customizable.
 
 ## How to Play
@@ -19,12 +25,6 @@ Your goal is to get the highest score possible. Your best score is saved automat
 
 ---
 
-## For Users
-
-The game features a fixed character design. No character customization is available.
-
----
-
 ## For Developers
 
 This project is built without any external frameworks, making it easy to understand and modify.
@@ -33,9 +33,9 @@ This project is built without any external frameworks, making it easy to underst
 
 -   `index.html`: The main structure of the game, including the canvas and UI popups.
 -   `style.css`: Contains all visual styling, from the parallax background to button designs and popup animations.
--   `game.js`: The core game logic. It handles physics, rendering, state management, scoring, and event handling.
+-   `game.js`: The core game logic. It handles physics, rendering, state management, scoring, and event handling. This file now includes enhanced physics, graphics, and animations.
 -   `/assets`:
--   `mycharacter.jpg`: The default character image.
+    -   `mycharacter.png`: The default character image.
     -   `fart.mp3`: The sound played when the character jumps.
     -   `hit.wav`: The sound played on collision.
     -   `ground.svg`: The ground texture used in the parallax background.
