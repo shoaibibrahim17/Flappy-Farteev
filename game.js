@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartButton = document.getElementById('restart-button');
 
     // Score Displays
+    const finalScoreDisplay = document.getElementById('final-score');
+    const bestScoreDisplay = document.getElementById('best-score');
+    const roastText = document.getElementById('roast-text');
 
 
     // --- GAME STATE & CONSTANTS ---
@@ -298,6 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Check for passing pipe to score
             if (!pipe.passed && pipe.x + pipe.width < player.x && i % 2 === 0) {
+                score++;
+                pipe.passed = true;
+                scoreDisplay.textContent = score;
 
                 // Add animation class
                 scoreDisplay.classList.add('score-pop');
@@ -320,7 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // --- GAME FLOW ---
     function init() {
         player = createPlayer();
-        console.log("init(): player object created:", player);
         pipes = []; // Ensure pipes array is initialized
         generatePipes(); // Generate initial pipes
         score = 0;
@@ -357,7 +362,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startGame() {
-        console.log("startGame(): Function started.");
         gameState = 'playing';
         startMenu.style.display = 'none';
         scoreDisplay.style.display = 'block';
@@ -369,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gameState !== 'over') {
             gameState = 'over';
             hitSound.play();
-            
+
             // Update best score
             if (score > bestScore) {
                 bestScore = score;
@@ -377,7 +381,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Display game over menu
-
+            finalScoreDisplay.textContent = score;
+            bestScoreDisplay.textContent = bestScore;
             const randomRoast = roastLines[Math.floor(Math.random() * roastLines.length)];
             roastText.textContent = randomRoast;
             gameOverMenu.style.display = 'flex';
@@ -488,7 +493,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateAndDrawFartPuffs() {
-        console.log("updateAndDrawFartPuffs(): started. fartPuffs:", fartPuffs, "ctx:", ctx);
         for (let i = fartPuffs.length - 1; i >= 0; i--) {
             const puff = fartPuffs[i];
             puff.x += puff.velocityX;
@@ -582,8 +586,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function onJump(event) {
         if (gameState === 'start') {
             startGame();
-        }
-        if (gameState === 'playing') {
+            player.jump();
+        } else if (gameState === 'playing') {
             player.jump();
         }
     }
@@ -602,5 +606,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZE GAME ---
     init();
-    console.log("DOMContentLoaded: Script finished.");
 });
