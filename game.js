@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Score Displays
     const finalScoreDisplay = document.getElementById('final-score');
     const bestScoreDisplay = document.getElementById('best-score');
+    const collectedCoinsDisplay = document.getElementById('collected-coins-display'); // New collected coins display
     const roastText = document.getElementById('roast-text');
 
     // --- GAME STATE & CONSTANTS ---
@@ -78,6 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GAME VARIABLES ---
     let player, pipes, score, bestScore, frameCount;
+    let coins = []; // Array to hold coin objects
+    let coinsCollected = 0; // New variable to track collected coins
     let backgroundOffset = 0;
     let cloudOffset = 0;
     let mountainOffset = 0;
@@ -198,13 +201,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- PIPE HANDLING ---
-    function createPipe(y, height) {
+    function createPipe(y, height, isMoving = false, moveRange = 0, moveSpeed = 0) {
         return {
             x: canvas.width,
             y: y,
             width: PIPE_WIDTH,
             height: height,
-            passed: false
+            passed: false,
+            isMoving: isMoving,
+            moveDirection: (Math.random() < 0.5) ? 1 : -1, // 1 for down, -1 for up
+            moveSpeed: moveSpeed,
+            moveRange: moveRange,
+            originalY: y
+        };
+    }
+
+    const COIN_SIZE = 20; // Define coin size
+
+    function createCoin(x, y) {
+        return {
+            x: x,
+            y: y,
+            size: COIN_SIZE,
+            collected: false
         };
     }
 
@@ -216,8 +235,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const bottomPipeY = topPipeHeight + currentPipeGap;
         const bottomPipeHeight = canvas.height - bottomPipeY - 50; // Account for ground
 
-        pipes.push(createPipe(0, topPipeHeight));
-        pipes.push(createPipe(bottomPipeY, bottomPipeHeight));
+        // Introduce moving pipes after a certain score
+        const movingPipeThreshold = 20;
+        let isMoving = false;
+        let moveRange = 0;
+        let moveSpeed = 0;
+
+        if (score > movingPipeThreshold && Math.random() < 0.3) { // 30% chance for moving pipes
+            isMoving = true;
+            moveRange = 50; // Move up/down by 50 pixels
+            moveSpeed = 1.5; // Pixels per frame
+        }
+
+        pipes.push(createPipe(0, topPipeHeight, isMoving, moveRange, moveSpeed));
+        pipes.push(createPipe(bottomPipeY, bottomPipeHeight, isMoving, moveRange, moveSpeed));
+
+        // Add a coin in the pipe gap
+        const coinY = topPipeHeight + currentPipeGap / 2 + (Math.random() * 40 - 20); // Center in gap with random offset
+        coins.push(createCoin(canvas.width + PIPE_WIDTH / 2 - COIN_SIZE / 2, coinY));
     }
     
     function updateAndDrawPipes() {
@@ -235,6 +270,17 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = pipes.length - 1; i >= 0; i--) {
             const pipe = pipes[i];
             pipe.x -= pipeSpeed;
+            
+            if (pipe.isMoving) {
+                pipe.y += pipe.moveDirection * pipe.moveSpeed;
+
+                // Reverse direction if limits are reached
+                if (pipe.moveDirection === 1 && pipe.y >= pipe.originalY + pipe.moveRange) {
+                    pipe.moveDirection = -1;
+                } else if (pipe.moveDirection === -1 && pipe.y <= pipe.originalY - pipe.moveRange) {
+                    pipe.moveDirection = 1;
+                }
+            }
             
             // Draw pipe with enhanced glossy effect and border
             const gradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipe.width, 0);
@@ -320,6 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function init() {
         player = createPlayer();
         pipes = [];
+        coins = []; // Reset coins array
+        coinsCollected = 0; // Reset collected coins count
         score = 0;
         frameCount = 0;
         bestScore = localStorage.getItem('bestScore') || 0;
@@ -374,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Display game over menu
             finalScoreDisplay.textContent = score;
+            collectedCoinsDisplay.textContent = coinsCollected; // Display collected coins
             bestScoreDisplay.textContent = bestScore;
             const randomRoast = roastLines[Math.floor(Math.random() * roastLines.length)];
             roastText.textContent = randomRoast;
@@ -525,6 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update and draw game objects
         updateAndDrawPipes();
+        updateAndDrawCoins(); // Update and draw coins
         player.update();
         player.draw();
         
