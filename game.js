@@ -223,9 +223,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateAndDrawPipes() {
         if (gameState !== 'playing') return;
 
-        pipeSpeed = basePipeSpeed + Math.min(10, Math.floor(score / 10)) * 0.1;
+        pipeSpeed = basePipeSpeed + Math.min(20, Math.floor(score / 5)) * 0.2; // More aggressive speed increase
 
-        if (frameCount % PIPE_SPAWN_RATE === 0) {
+        const minPipeSpawnRate = 100;
+        const currentPipeSpawnRate = Math.max(PIPE_SPAWN_RATE - Math.floor(score / 10) * 5, minPipeSpawnRate); // Pipes spawn more frequently
+
+        if (frameCount % currentPipeSpawnRate === 0) {
             generatePipes();
         }
 
