@@ -24,11 +24,10 @@ body {
 
 #game-title {
     position: absolute;
-    top: 15%; /* Adjust position slightly */
+    top: 5%; /* Adjusted position to top */
     width: 100%;
     text-align: center;
-    font-size: 2.5em; /* Reduced font size */
-    /* text-shadow will be on the whole title */
+    font-size: 1.8em; /* Reduced font size */
     z-index: 10;
     /* More pronounced text shadow for a Flappy Bird-like outline with theme colors */
     text-shadow:
@@ -39,13 +38,12 @@ body {
         -6px 6px 0 rgba(0,100,0,0.5); /* A slightly offset darker shadow for depth */
 }
 
-#game-title .part1 {
-    color: #FF5733; /* First color (e.g., orange-red) */
-}
-
-#game-title .part2 {
-    color: #33FF57; /* Second color (e.g., vibrant green) */
-}
+#game-title .c1 { color: #FFD700; } /* Gold */
+#game-title .c2 { color: #FF6347; } /* Tomato */
+#game-title .c3 { color: #ADFF2F; } /* GreenYellow */
+#game-title .c4 { color: #1E90FF; } /* DodgerBlue */
+#game-title .c5 { color: #DA70D6; } /* Orchid */
+#game-title .c6 { color: #F0E68C; } /* Khaki */
 
 canvas {
     display: block;
