@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         oscillator.type = 'triangle';
         oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); // Increased volume
 
         oscillator.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.05);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
@@ -254,6 +254,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add a coin in the pipe gap
         const coinY = topPipeHeight + currentPipeGap / 2 + (Math.random() * 40 - 20); // Center in gap with random offset
         coins.push(createCoin(canvas.width + PIPE_WIDTH / 2 - COIN_SIZE / 2, coinY));
+
+        // Randomly add more coins above/below pipes
+        if (Math.random() < 0.5) { // 50% chance for an extra coin
+            const extraCoinX = canvas.width + PIPE_WIDTH / 2 - COIN_SIZE / 2 + (Math.random() * 20 - 10);
+            if (Math.random() < 0.5) { // Above top pipe
+                const yPos = Math.random() * (topPipeHeight - COIN_SIZE - 10) + 10;
+                if (yPos > COIN_SIZE && yPos < canvas.height - COIN_SIZE) // Ensure within bounds
+                    coins.push(createCoin(extraCoinX, yPos));
+            } else { // Below bottom pipe
+                const yPos = bottomPipeY + bottomPipeHeight + COIN_SIZE + Math.random() * (canvas.height - (bottomPipeY + bottomPipeHeight) - COIN_SIZE - 10) - 10;
+                if (yPos > COIN_SIZE && yPos < canvas.height - COIN_SIZE) // Ensure within bounds
+                    coins.push(createCoin(extraCoinX, yPos));
+            }
+        }
     }
     
     function updateAndDrawPipes() {
